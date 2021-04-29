@@ -5,6 +5,9 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/x509"
+	"encoding/pem"
+	"fmt"
 	"io"
 
 	"github.com/mariotoffia/goservice/interfaces/ifcrypto"
@@ -37,6 +40,45 @@ func NewECDSAPrivateKeyFromKey(
 		key:    key,
 		public: NewECDSAPublicKeyFromKey(id, &key.PublicKey, usage...),
 	}
+
+}
+
+// NewECDSAPrivateKeyFromPEM initializes a new `*ecdsa.PrivateKey` from the underlying _PEM_ block.
+func NewECDSAPrivateKeyFromPEM(
+	block pem.Block,
+	id string,
+	usage ...ifcrypto.KeyUsage,
+) (*ECDSAPrivateKey, error) {
+
+	if block.Type == "PRIVATE KEY" {
+		key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if ecdsakey, ok := key.(*ecdsa.PrivateKey); ok {
+
+			return NewECDSAPrivateKeyFromKey(id, ecdsakey, usage...), nil
+
+		}
+
+		return nil, fmt.Errorf("not a *ecdsa.PrivateKey: %T", key)
+
+	}
+
+	if block.Type == "EC PRIVATE KEY" {
+
+		key, err := x509.ParseECPrivateKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+
+		return NewECDSAPrivateKeyFromKey(id, key, usage...), nil
+
+	}
+
+	return nil, fmt.Errorf("unsupported PEM block: %s", block.Type)
 
 }
 
@@ -129,6 +171,35 @@ func NewECDSAPublicKeyFromKey(
 		},
 		key: key,
 	}
+
+}
+
+// NewECDSAPublicKeyFromPEM initializes a new `*ecdsa.PublicKey` from the underlying _PEM_ block.
+func NewECDSAPublicKeyFromPEM(
+	block pem.Block,
+	id string,
+	usage ...ifcrypto.KeyUsage,
+) (*ECDSAPublicKey, error) {
+
+	if block.Type == "PUBLIC KEY" || block.Type == "EC PUBLIC KEY" {
+
+		key, err := x509.ParsePKIXPublicKey(block.Bytes)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if ecdsakey, ok := key.(*ecdsa.PublicKey); ok {
+
+			return NewECDSAPublicKeyFromKey(id, ecdsakey, usage...), nil
+
+		}
+
+		return nil, fmt.Errorf("not a *ecdsa.PublicKey: %T", key)
+
+	}
+
+	return nil, fmt.Errorf("unsupported PEM block: %s", block.Type)
 
 }
 

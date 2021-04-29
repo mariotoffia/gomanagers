@@ -4,6 +4,9 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
+	"fmt"
 	"io"
 
 	"github.com/mariotoffia/goservice/interfaces/ifcrypto"
@@ -36,6 +39,45 @@ func NewRSAPrivateKeyFromKey(
 		key:    key,
 		public: NewRSAPublicKeyFromKey(id, &key.PublicKey, usage...),
 	}
+
+}
+
+// NewRSAPrivateKeyFromPEM initializes a new `*rsa.PrivateKey` from the underlying _PEM_ block.
+func NewRSAPrivateKeyFromPEM(
+	block pem.Block,
+	id string,
+	usage ...ifcrypto.KeyUsage,
+) (*RSAPrivateKey, error) {
+
+	if block.Type == "PRIVATE KEY" {
+		key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if rsakey, ok := key.(*rsa.PrivateKey); ok {
+
+			return NewRSAPrivateKeyFromKey(id, rsakey, usage...), nil
+
+		}
+
+		return nil, fmt.Errorf("not a rsa.PrivateKey: %T", key)
+
+	}
+
+	if block.Type == "RSA PRIVATE KEY" {
+
+		key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+
+		return NewRSAPrivateKeyFromKey(id, key, usage...), nil
+
+	}
+
+	return nil, fmt.Errorf("unsupported PEM block: %s", block.Type)
 
 }
 
@@ -129,6 +171,35 @@ func NewRSAPublicKeyFromKey(
 		},
 		key: key,
 	}
+
+}
+
+// NewRSAPublicKeyFromPEM initializes a new `*rsa.PublicKey` from the underlying _PEM_ block.
+func NewRSAPublicKeyFromPEM(
+	block pem.Block,
+	id string,
+	usage ...ifcrypto.KeyUsage,
+) (*RSAPublicKey, error) {
+
+	if block.Type == "PUBLIC KEY" || block.Type == "RSA PUBLIC KEY" {
+
+		key, err := x509.ParsePKIXPublicKey(block.Bytes)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if rsakey, ok := key.(*rsa.PublicKey); ok {
+
+			return NewRSAPublicKeyFromKey(id, rsakey, usage...), nil
+
+		}
+
+		return nil, fmt.Errorf("not a *rsa.PublicKey: %T", key)
+
+	}
+
+	return nil, fmt.Errorf("unsupported PEM block: %s", block.Type)
 
 }
 
