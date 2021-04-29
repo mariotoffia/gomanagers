@@ -1,6 +1,7 @@
 package gocrypto
 
 import (
+	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"io"
@@ -19,7 +20,11 @@ type RSAPrivateKey struct {
 // NewRSAPrivateKeyFromKey creates a new `RSAPrivateKey`
 //
 // The public key portion derives the same usage as the private key
-func NewRSAPrivateKeyFromKey(id string, key *rsa.PrivateKey, usage ...ifcrypto.KeyUsage) *RSAPrivateKey {
+func NewRSAPrivateKeyFromKey(
+	id string,
+	key *rsa.PrivateKey,
+	usage ...ifcrypto.KeyUsage,
+) *RSAPrivateKey {
 
 	return &RSAPrivateKey{
 		KeyBase: KeyBase{
@@ -43,6 +48,19 @@ func NewRSAPrivateKey(id string, bits int, usage ...ifcrypto.KeyUsage) (*RSAPriv
 	}
 
 	return NewRSAPrivateKeyFromKey(id, key, usage...), nil
+}
+
+// Sign implements the `crypto.Signer` _interface_.If opts is a
+// *PSSOptions then the PSS algorithm will be used, otherwise
+// PKCS #1 v1.5 will be used.
+func (r *RSAPrivateKey) Sign(
+	rand io.Reader,
+	digest []byte,
+	opts crypto.SignerOpts,
+) ([]byte, error) {
+
+	return r.key.Sign(rand, digest, opts)
+
 }
 
 // GetPublic returns the public portion of the key
@@ -96,7 +114,11 @@ type RSAPublicKey struct {
 }
 
 // NewRSAPublicKeyFromKey creates a instance based on a existing public key.
-func NewRSAPublicKeyFromKey(id string, key *rsa.PublicKey, usage ...ifcrypto.KeyUsage) *RSAPublicKey {
+func NewRSAPublicKeyFromKey(
+	id string,
+	key *rsa.PublicKey,
+	usage ...ifcrypto.KeyUsage,
+) *RSAPublicKey {
 
 	return &RSAPublicKey{
 		KeyBase: KeyBase{

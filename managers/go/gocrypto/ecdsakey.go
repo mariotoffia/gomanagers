@@ -1,6 +1,7 @@
 package gocrypto
 
 import (
+	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -48,6 +49,18 @@ func NewECDSAPrivateKey(id string, bits int, usage ...ifcrypto.KeyUsage) (*ECDSA
 	}
 
 	return NewECDSAPrivateKeyFromKey(id, key, usage...), nil
+}
+
+// Sign implements the `crypto.Signer` _interface_. The _opts_
+// arguments is not used.
+func (r *ECDSAPrivateKey) Sign(
+	rand io.Reader,
+	digest []byte,
+	opts crypto.SignerOpts,
+) ([]byte, error) {
+
+	return r.key.Sign(rand, digest, opts)
+
 }
 
 // GetPublic returns the public portion of the key

@@ -6,6 +6,8 @@ import (
 )
 
 // Signer is a entity that may sign a signature.
+//
+// NOTE: Some keys do implement `crypto.Signer` interface directly on the key.
 type Signer interface {
 	// Sign will sign the _msg_ using the provided _key_.
 	Sign(
