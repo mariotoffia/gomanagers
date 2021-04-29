@@ -1,5 +1,7 @@
 package ifcrypto
 
+import "crypto"
+
 // KeyUsage is the usage of a key.
 //
 // NOTE: Some keys may have multiple _KeyUsage_.
@@ -47,14 +49,17 @@ const (
 	SignAlgorithmRsaPssSha384      SignAlgorithm = "rsa-pss-sha384"
 	SignAlgorithmRsaPssSha512      SignAlgorithm = "rsa-pss-sha512"
 	SignAlgorithmRsaPkcs1V15Sha256 SignAlgorithm = "rsa-pkcs1-v1.5-sha256"
-	SignAlgorithmRsaPkcs1V15Sha384 SignAlgorithm = "rsa-pkcs1-v1.5-sha256"
-	SignAlgorithmRsaPkcs1V15Sha512 SignAlgorithm = "rsa-pkcs1-v1.5-sha256"
+	SignAlgorithmRsaPkcs1V15Sha384 SignAlgorithm = "rsa-pkcs1-v1.5-sha384"
+	SignAlgorithmRsaPkcs1V15Sha512 SignAlgorithm = "rsa-pkcs1-v1.5-sha512"
 	SignAlgorithmEcdSha256         SignAlgorithm = "ecd-sha256"
 	SignAlgorithmEcdSha384         SignAlgorithm = "ecd-sha384"
 	SignAlgorithmEcdSha512         SignAlgorithm = "ecd-sha512"
 )
 
 // Key represents a single key.
+//
+// The key may or may not be present in memory, it may be within a hardware unit or in a service
+// such as _AWS KMS_ and the `Key` instance is merely a info block.
 type Key interface {
 	// GetID returns a id of the key.
 	//
@@ -84,6 +89,23 @@ type Key interface {
 	//
 	// If `KeyTypeSymmetric` it will return `true` since all symmetric keys are considered as private.
 	IsPrivate() bool
+	// IsRemoteKey returns `true` if the key is not present in current process memory.
+	//
+	// Typically hardware units or remote services will not reveal their private key. In such case, this
+	// method returns `true`. If present in memory such as a `*rsa.PrivateKey` it returns `false`.
+	IsRemoteKey() bool
+}
+
+// PublicKey is a explicit public `Key`
+type PublicKey interface {
+	crypto.PublicKey
+	Key
+}
+
+// PrivateKey is a explicit private `Key`
+type PrivateKey interface {
+	crypto.PrivateKey
+	Key
 }
 
 // KeyPair contains a private and a public key.
@@ -93,7 +115,7 @@ type Key interface {
 // public key may be used only for verification.
 type KeyPair interface {
 	// Key - holds the private portion of this key.
-	Key
+	PrivateKey
 	// GetPublic returns the public portion of the key
-	GetPublic() Key
+	GetPublic() PublicKey
 }
