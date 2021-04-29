@@ -1,0 +1,8 @@
+= Go Service SDK
+
+This is a _SDK_ that allows for writing, portable, services much more simpler. It uses a animalistic _"lego brick"_ approach to build larger bricks from smaller that one may use in different level to write services such as _AWS Lambdas_.  
+
+== Managers
+A set of managers that implements interfaces to allow for replacement of technologies such as s3 or filesystem, kms or local encryption / signing etc.
+
+All managers implements interfaces from the `interface` sub-packages.
