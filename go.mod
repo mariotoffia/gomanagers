@@ -1,4 +1,4 @@
-module github.com/mariotoffia/gomanagers
+module github.com/mariotoffia/goservice
 
 require (
 	github.com/ahmetb/go-linq/v3 v3.2.0
