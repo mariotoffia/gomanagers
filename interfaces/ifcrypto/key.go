@@ -1,6 +1,8 @@
 package ifcrypto
 
-import "crypto"
+import (
+	"crypto"
+)
 
 // KeyUsage is the usage of a key.
 //
