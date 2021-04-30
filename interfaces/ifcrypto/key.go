@@ -58,6 +58,12 @@ const (
 	SignAlgorithmEcdSha512         SignAlgorithm = "ecd-sha512"
 )
 
+type Chipher string
+
+const (
+	ChiperAES256 Chipher = "aes256"
+)
+
 // Key represents a single key.
 //
 // The key may or may not be present in memory, it may be within a hardware unit or in a service
@@ -74,6 +80,8 @@ type Key interface {
 	GetKeySize() int
 	// GetKeyType returns this keys `KeyType`.
 	GetKeyType() KeyType
+	// GetSupportedChiphers returns all the chipers that the key be used with.
+	GetSupportedChiphers() []Chipher
 	// CanSign checks if the current _Key_ may participate in _alg_ `SignAlgorithm` to do sign operations with.
 	CanSign(alg SignAlgorithm) bool
 	// CanVerify checks if the current _Key_ may participate in _alg_ `SignAlgorithm` to do verify on

@@ -15,7 +15,7 @@ type Signer interface {
 		key ifcrypto.Key,
 		signAlgorithm ifcrypto.SignAlgorithm,
 		tags ...coremodel.Meta,
-	)
+	) error
 }
 
 // Verifier is implemented by those who may verify a signature.
@@ -26,5 +26,16 @@ type Verifier interface {
 		key ifcrypto.Key,
 		signAlgorithm ifcrypto.SignAlgorithm,
 		tags ...coremodel.Meta,
-	)
+	) error
+}
+
+// Cipherable is a encrypt / decrypt capable implementation.
+//
+// NOTE: Some keys do implement `crypto.Decrypter`, thus is
+// able to decrypt via the key directly.
+type Cipherable interface {
+	// Encrypt will encrypt the _plaintext_ using the key.
+	Encrypt(plaintext []byte, key ifcrypto.Key) (encrypted []byte, err error)
+	// Decrypt will decrypt the _encrypted_ using the key.
+	Decrypt(encrypted []byte, key ifcrypto.Key) (plaintext []byte, err error)
 }

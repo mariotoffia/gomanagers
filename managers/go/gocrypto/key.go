@@ -13,6 +13,7 @@ import (
 type KeyBase struct {
 	id      string
 	usage   []ifcrypto.KeyUsage
+	chiper  []ifcrypto.Chipher
 	keyType ifcrypto.KeyType
 	keySize int
 }
@@ -33,6 +34,11 @@ func (b *KeyBase) GetKeyUsage() []ifcrypto.KeyUsage {
 // GetKeyType returns this keys `KeyType`.
 func (b *KeyBase) GetKeyType() ifcrypto.KeyType {
 	return b.keyType
+}
+
+// GetSupportedChiphers returns all the chipers that the key be used with.
+func (b *KeyBase) GetSupportedChiphers() []ifcrypto.Chipher {
+	return b.chiper
 }
 
 // CanSign checks if the current _Key_ may participate in _alg_ `SignAlgorithm` to do sign operations with.

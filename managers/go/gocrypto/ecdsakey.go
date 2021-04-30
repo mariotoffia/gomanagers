@@ -36,6 +36,7 @@ func NewECDSAPrivateKeyFromKey(
 			keyType: ifcrypto.KeyTypeRsa,
 			keySize: key.Params().BitSize,
 			usage:   usage,
+			chiper:  []ifcrypto.Chipher{},
 		},
 		key:    key,
 		public: NewECDSAPublicKeyFromKey(id, &key.PublicKey, usage...),

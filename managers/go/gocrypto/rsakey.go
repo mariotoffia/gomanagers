@@ -35,6 +35,7 @@ func NewRSAPrivateKeyFromKey(
 			keyType: ifcrypto.KeyTypeRsa,
 			keySize: key.Size(),
 			usage:   usage,
+			chiper:  []ifcrypto.Chipher{},
 		},
 		key:    key,
 		public: NewRSAPublicKeyFromKey(id, &key.PublicKey, usage...),
@@ -102,6 +103,19 @@ func (r *RSAPrivateKey) Sign(
 ) ([]byte, error) {
 
 	return r.key.Sign(rand, digest, opts)
+
+}
+
+// Decrypt implements the `crypto.Decrypter` _interface_. If opts is `nil` or of type
+// `*PKCS1v15DecryptOptions` then _PKCS #1 v1.5_ decryption is performed. Otherwise
+// opts must have type `*OAEPOptions` and _OAEP_ decryption is done.
+func (r *RSAPrivateKey) Decrypt(
+	rand io.Reader,
+	msg []byte,
+	opts crypto.DecrypterOpts,
+) (plaintext []byte, err error) {
+
+	return r.key.Decrypt(rand, msg, opts)
 
 }
 
