@@ -2,6 +2,7 @@ package ifkms
 
 import (
 	"github.com/mariotoffia/goservice/interfaces/ifcrypto"
+	"github.com/mariotoffia/goservice/interfaces/ifctx"
 	"github.com/mariotoffia/goservice/model/coremodel"
 )
 
@@ -11,6 +12,7 @@ import (
 type Signer interface {
 	// Sign will sign the _msg_ using the provided _key_.
 	Sign(
+		c ifctx.ServiceContext,
 		msg []byte,
 		key ifcrypto.Key,
 		signAlgorithm ifcrypto.SignAlgorithm,
@@ -22,6 +24,7 @@ type Signer interface {
 type Verifier interface {
 	// Verify will verify the _msg_ using the provided _key_
 	Verify(
+		c ifctx.ServiceContext,
 		msg []byte,
 		key ifcrypto.Key,
 		signAlgorithm ifcrypto.SignAlgorithm,
@@ -35,7 +38,18 @@ type Verifier interface {
 // able to decrypt via the key directly.
 type Cipherable interface {
 	// Encrypt will encrypt the _plaintext_ using the key.
-	Encrypt(plaintext []byte, key ifcrypto.Key) (encrypted []byte, err error)
+	Encrypt(
+		c ifctx.ServiceContext,
+		plaintext []byte,
+		key ifcrypto.Key,
+		cipher ifcrypto.Chipher,
+	) (encrypted []byte, err error)
+
 	// Decrypt will decrypt the _encrypted_ using the key.
-	Decrypt(encrypted []byte, key ifcrypto.Key) (plaintext []byte, err error)
+	Decrypt(
+		c ifctx.ServiceContext,
+		encrypted []byte,
+		key ifcrypto.Key,
+		cipher ifcrypto.Chipher,
+	) (plaintext []byte, err error)
 }
