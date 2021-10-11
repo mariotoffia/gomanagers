@@ -8,6 +8,7 @@ import (
 	"github.com/mariotoffia/goservice/interfaces/ifcrypto"
 	"github.com/mariotoffia/goservice/interfaces/ifctx"
 	"github.com/mariotoffia/goservice/model/coremodel"
+	"github.com/mariotoffia/goservice/utils"
 )
 
 // AwsKms implements xyz interfaces to use the
@@ -29,7 +30,9 @@ func (km *AwsKms) Sign(
 		return err
 	}
 
-	client.Sign(c, &kms.SignInput{})
+	client.Sign(c, &kms.SignInput{
+		KeyId: utils.ToStringPtrNil(key.GetID()),
+	})
 
 	return nil
 }

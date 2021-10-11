@@ -13,9 +13,12 @@
         "awskm",
         "fsys",
         "gocrypto",
+        "gokms",
+        "goservice",
         "ifcrypto",
         "ifctx",
         "ifkms",
+        "mariotoffia",
         "secg"
     ]
 }

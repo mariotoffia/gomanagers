@@ -14,3 +14,16 @@ func Contains(slice []string, str string) (index int, ok bool) {
 
 	return -1, false
 }
+
+func ToStringPtr(str string) *string {
+	return &str
+}
+
+func ToStringPtrNil(str string) *string {
+
+	if str == "" {
+		return nil
+	}
+
+	return &str
+}
